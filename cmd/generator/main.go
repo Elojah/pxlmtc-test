@@ -74,6 +74,7 @@ func main() {
 			return graph.Rooms[rand.Intn(len(graph.Rooms))] // nolint: gosec
 		},
 
+		// ExitFunc embed a sync.Once to ensure exit is generated once
 		ExitFunc: func() bool {
 			var result bool
 

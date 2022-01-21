@@ -131,9 +131,9 @@ func (n *Node) Generate(ctx context.Context, cfg *ConfigGeneration, eg *errgroup
 			// roll if no-go room is exit or not
 			if cfg.ExitCreated == nil && cfg.ExitFunc() {
 				cfg.ExitCreated = &struct{}{}
-				(*n)[directions[i]] = json.RawMessage("\"" + Exit + "\"")
+				(*n)[directions[i]] = json.RawMessage(`"` + Exit + `"`)
 			} else {
-				(*n)[directions[i]] = json.RawMessage("\"" + cfg.RoomFunc() + "\"")
+				(*n)[directions[i]] = json.RawMessage(`"` + cfg.RoomFunc() + `"`)
 			}
 		} else {
 			i := i
@@ -141,21 +141,21 @@ func (n *Node) Generate(ctx context.Context, cfg *ConfigGeneration, eg *errgroup
 			eg.Go(func() error {
 				var child Node
 
-				var insideEG errgroup.Group
+				var branchEG errgroup.Group
 
 				// create a new sub graph
-				if err := child.Generate(ctx, cfg, &insideEG, depth); err != nil {
+				if err := child.Generate(ctx, cfg, &branchEG, depth); err != nil {
 					return err
 				}
 
-				if err := insideEG.Wait(); err != nil {
+				if err := branchEG.Wait(); err != nil {
 					return err
 				}
 
 				// sub graph is actually a leaf
 				if len(child) == 0 {
 					wm.Lock()
-					(*n)[directions[i]] = json.RawMessage("\"" + cfg.RoomFunc() + "\"")
+					(*n)[directions[i]] = json.RawMessage(`"` + cfg.RoomFunc() + `"`)
 					wm.Unlock()
 				} else {
 					// set subgraph as json raw message
